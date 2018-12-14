@@ -66,10 +66,11 @@ public class MessageRecvExecutor implements ApplicationContextAware,
 	// 默认JDK本地序列号协议
 	private RpcSerializerProtocol serializerProtocol = RpcSerializerProtocol.JDK_SERIALLZE;
 
-	public MessageRecvExecutor(String serverAddress, String serializeProtocol) {
+	public MessageRecvExecutor(String serverAddress,String protocol) {
 		this.serverAddress = serverAddress;
 		this.serializerProtocol = Enum.valueOf(RpcSerializerProtocol.class,
-				serializeProtocol);
+				protocol);
+		
 	}
 
 	public static void submit(Callable<Boolean> task,

@@ -11,7 +11,7 @@
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="locations">
 			<list>
-				<value>classpath:rpc-server.properties</value>
+				<value>classpath:rpc-server-jdknative.properties</value>
 			</list>
 		</property>
 	</bean>
@@ -27,5 +27,8 @@
 	<bean id="calc" class="com.netty.server.servicebean.CaculateImpl" />
 	<bean id="rpcServer" class="com.netty.server.core.MessageRecvExecutor">
 		<constructor-arg name="serverAddress" value="${rpc.server.addr}" />
+		<constructor-arg name="protocol" value="JDK_SERIALLZE"/>
+		<!-- 
+		<constructor-arg name="serializerProtocol" value="jdknative"/> -->
 	</bean>
 </beans>
