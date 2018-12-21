@@ -15,6 +15,7 @@ import com.netty.server.serialize.support.hessian.HessianCodeUtil;
 import com.netty.server.serialize.support.hessian.HessianDecoder;
 import com.netty.server.serialize.support.hessian.HessianEncoder;
 import com.netty.server.serialize.support.kryo.KryoCodeUtil;
+import com.netty.server.serialize.support.kryo.KryoDecoder;
 import com.netty.server.serialize.support.kryo.KryoEncoder;
 import com.netty.server.serialize.support.kryo.KryoPoolFactory;
 
@@ -47,7 +48,7 @@ public class RpcRecvSerializeFrame implements RpcSerializeFrame {
 			KryoCodeUtil util = new KryoCodeUtil(
 					KryoPoolFactory.getKryoPoolInstance());
 			pipeline.addLast(new KryoEncoder(util));
-			pipeline.addLast(new KryoEncoder(util));
+			pipeline.addLast(new KryoDecoder(util));
 			pipeline.addLast(new MessageRecvHandler(handlerMap));
 			break;
 		}

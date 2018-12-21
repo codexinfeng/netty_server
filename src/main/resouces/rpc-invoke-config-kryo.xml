@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:nettyrpc="http://www.envelope.com/nettyrpc"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.envelope.com/nettyrpc
+       http://www.envelope.com/nettyrpc/nettyrpc.xsd
        http://www.springframework.org/schema/context
        http://www.springframework.org/schema/context/spring-context.xsd">
 
 	<context:component-scan base-package="com.netty.server" />
+
 	<bean
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="locations">
@@ -25,8 +29,13 @@
 		</property>
 	</bean>
 	<bean id="calc" class="com.netty.server.servicebean.CaculateImpl" />
+	<!-- ${rpc.server.addr} 里面的value是怎么解析的 -->
+	<nettyrpc:reference id="addCalc"
+		interfaceName="com.netty.server.servicebean.Caculate" protocol="KRYO_SERIALIZE"
+		ipAddr="127.0.0.1:18888" />
 	<bean id="rpcServer" class="com.netty.server.core.MessageRecvExecutor">
 		<constructor-arg name="serverAddress" value="${rpc.server.addr}" />
-		<constructor-arg name="protocol" value="KRYO_SERIALIZE"/>
+		<constructor-arg name="protocol" value="KRYO_SERIALIZE" />
 	</bean>
+
 </beans>

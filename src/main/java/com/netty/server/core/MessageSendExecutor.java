@@ -10,6 +10,15 @@ import com.google.common.reflect.Reflection;
  */
 public class MessageSendExecutor {
 
+	// µ¥ÀýÄ£Ê½
+	private static class MessageSendExecutorSingle {
+		private static final MessageSendExecutor sendExecutor = new MessageSendExecutor();
+	}
+
+	public static MessageSendExecutor getInstance() {
+		return MessageSendExecutorSingle.sendExecutor;
+	}
+
 	private RpcServerLoader loader = RpcServerLoader.getInstance();
 
 	public MessageSendExecutor() {
@@ -42,7 +51,7 @@ public class MessageSendExecutor {
 	// new MessageSendProxy<T>(rpcInterface));
 	// }
 
-	public static <T> T execute(Class<T> rpcInterface) {
+	public <T> T execute(Class<T> rpcInterface) {
 		return (T) Reflection.newProxy(rpcInterface, new MessageSendProxy<T>());
 	}
 }

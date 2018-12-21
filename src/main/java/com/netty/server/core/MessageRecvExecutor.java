@@ -20,7 +20,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -33,8 +32,7 @@ import com.netty.server.model.MessageKeyVal;
 import com.netty.server.model.MessageRequest;
 import com.netty.server.model.MessageResponse;
 
-public class MessageRecvExecutor implements ApplicationContextAware,
-		InitializingBean {
+public class MessageRecvExecutor implements ApplicationContextAware {
 
 	// V1 版本
 
@@ -59,18 +57,44 @@ public class MessageRecvExecutor implements ApplicationContextAware,
 	// threadPoolExecutor.submit(task);
 	// }
 	private String serverAddress;
-
-	private final static String DELIMITER = ":";
-	private Map<String, Object> handlerMap = new ConcurrentHashMap<>();
-	private static ListeningExecutorService threadPoolExecutor;
+	private int echoApiPort;
 	// 默认JDK本地序列号协议
 	private RpcSerializerProtocol serializerProtocol = RpcSerializerProtocol.JDK_SERIALLZE;
+	private static final String DELIMITER = ":";
+	private static final int PARALLEL = RpcSystemConfig.PARALLEL * 2;
+	private static int threadNums = RpcSystemConfig.SYSTEM_PROPERTY_THREADPOOL_THREAD_NUMS;
+	private static int queueNums = RpcSystemConfig.SYSTEM_PROPERTY_THREADPOOL_QUEUE_NAME;
+	private static volatile ListeningExecutorService threadPoolExecutor;
+	private Map<String, Object> handlerMap = new ConcurrentHashMap<>();
+	private int numberOfEchoThreadsPool = 1;
+	ThreadFactory threadFactory = new NameThreadFactory(
+			"NettyRpc ThreadFactory");
+	EventLoopGroup boss = new NioEventLoopGroup();
+	EventLoopGroup worker = new NioEventLoopGroup(PARALLEL, threadFactory,
+			SelectorProvider.provider());
 
-	public MessageRecvExecutor(String serverAddress,String protocol) {
+	private MessageRecvExecutor() {
+		handlerMap.clear();
+		register();
+	}
+
+	private void register() {
+//		handlerMap.put(RpcSystemConfig, value)
+	}
+
+	private static class MessageRecvExecutorHolder {
+		static final MessageRecvExecutor INSTANCE = new MessageRecvExecutor();
+	}
+
+	public static MessageRecvExecutor getInstance() {
+		return MessageRecvExecutorHolder.INSTANCE;
+	}
+
+	public MessageRecvExecutor(String serverAddress, String protocol) {
 		this.serverAddress = serverAddress;
 		this.serializerProtocol = Enum.valueOf(RpcSerializerProtocol.class,
 				protocol);
-		
+
 	}
 
 	public static void submit(Callable<Boolean> task,
@@ -110,50 +134,47 @@ public class MessageRecvExecutor implements ApplicationContextAware,
 		}, threadPoolExecutor);
 	}
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		// netty的线程池模型设置为主从线程池模型,应对高并发
-		// netty还支持单线程,多网络IO
-		ThreadFactory threadFactory = new NameThreadFactory(
-				"NettyRPC ThreadFactory");
-		// java 虚拟机可用的处理器
-		int parallel = Runtime.getRuntime().availableProcessors() * 2;
-
-		EventLoopGroup boss = new NioEventLoopGroup();
-		EventLoopGroup worker = new NioEventLoopGroup(parallel, threadFactory,
-				SelectorProvider.provider());
-		try {
-			ServerBootstrap bootstrap = new ServerBootstrap();
-			bootstrap
-					.group(boss, worker)
-					.channel(NioServerSocketChannel.class)
-					.childHandler(
-							new MessageRecvChannelInitializer(handlerMap)
-									.buildRpcSerializeProtocol(serializerProtocol))
-					.option(ChannelOption.SO_BACKLOG, 128)
-					.childOption(ChannelOption.SO_KEEPALIVE, true);
-			String[] ipAddr = serverAddress
-					.split(MessageRecvExecutor.DELIMITER);
-			if (ipAddr.length == 2) {
-				String host = ipAddr[0];
-				int port = Integer.valueOf(ipAddr[1]);
-				ChannelFuture future = bootstrap.bind(host, port).sync();
-				System.out.printf(
-						"Netty RPC Server start success ip:%s port:%d\n", host,
-						port);
-				// 表示异步等待
-				future.channel().closeFuture().sync();
-			} else {
-				System.out.println("Netty RPC server start fail");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			worker.shutdownGracefully();
-			boss.shutdownGracefully();
-		}
-
-	}
+//	@Override
+//	public void afterPropertiesSet() throws Exception {
+//		// netty的线程池模型设置为主从线程池模型,应对高并发
+//		// netty还支持单线程,多网络IO
+//		ThreadFactory threadFactory = new NameThreadFactory(
+//				"NettyRPC ThreadFactory");
+//		// java 虚拟机可用的处理器
+//		int parallel = Runtime.getRuntime().availableProcessors() * 2;
+//
+//		try {
+//			ServerBootstrap bootstrap = new ServerBootstrap();
+//			bootstrap
+//					.group(boss, worker)
+//					.channel(NioServerSocketChannel.class)
+//					.childHandler(
+//							new MessageRecvChannelInitializer(handlerMap)
+//									.buildRpcSerializeProtocol(serializerProtocol))
+//					.option(ChannelOption.SO_BACKLOG, 128)
+//					.childOption(ChannelOption.SO_KEEPALIVE, true);
+//			String[] ipAddr = serverAddress
+//					.split(MessageRecvExecutor.DELIMITER);
+//			if (ipAddr.length == 2) {
+//				String host = ipAddr[0];
+//				int port = Integer.valueOf(ipAddr[1]);
+//				ChannelFuture future = bootstrap.bind(host, port).sync();
+//				System.out.printf(
+//						"Netty RPC Server start success ip:%s port:%d\n", host,
+//						port);
+//				// 表示异步等待
+//				future.channel().closeFuture().sync();
+//			} else {
+//				System.out.println("Netty RPC server start fail");
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		} finally {
+//			worker.shutdownGracefully();
+//			boss.shutdownGracefully();
+//		}
+//
+//	}
 
 	@Override
 	public void setApplicationContext(ApplicationContext ctx)

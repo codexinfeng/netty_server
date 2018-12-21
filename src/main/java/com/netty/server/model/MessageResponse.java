@@ -6,12 +6,12 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-public class MessageResponse implements Serializable {
+public class MessageResponse  {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 3800819758626036488L;
+//	private static final long serialVersionUID = 3800819758626036488L;
 
 	private String messageId;
 

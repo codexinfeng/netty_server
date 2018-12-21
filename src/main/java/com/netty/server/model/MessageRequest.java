@@ -12,12 +12,12 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * @author JZG
  *
  */
-public class MessageRequest implements Serializable {
+public class MessageRequest  {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 8563410322239405135L;
+//	private static final long serialVersionUID = 8563410322239405135L;
 
 	private String messageId;
 
