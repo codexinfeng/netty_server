@@ -17,4 +17,15 @@ public class RpcSystemConfig {
 
 	public static final String RPC_COMPILER_SPI_ATTR = "AccessAdaptive";
 	public static final String RPC_ABILITY_DETAIL_SPI_STTR = "AbilityDetail";
+
+	private static boolean monitorServerSupport = false;
+
+	public static boolean isMonitorServerSupport() {
+		return monitorServerSupport;
+	}
+
+	public static void setMonitorServerSupport(boolean monitorServerSupport) {
+		RpcSystemConfig.monitorServerSupport = monitorServerSupport;
+	}
+
 }

@@ -20,14 +20,11 @@ public class MessageRecvHandler extends ChannelInboundHandlerAdapter {
 	public void channelRead(ChannelHandlerContext ctx, Object msg) {
 		MessageRequest request = (MessageRequest) msg;
 		MessageResponse response = new MessageResponse();
-		// V1版本
 		// MessageRecvInitializeTask recvTask = new MessageRecvInitializeTask(
 		// request, response, handlerMap, ctx);
-		// 不需要阻塞nio线程,复杂的业务逻辑丢给专门的线程池
 		// MessageRecvExecutor.submit(recvTask);
 		// MessageRecvExecutor.submit(task, ctx, request, response);
 
-		// V2版本
 		MessageRecvInitializeCallTask recvTask = new MessageRecvInitializeCallTask(
 				request, response, handlerMap);
 		MessageRecvExecutor.submit(recvTask, ctx, request, response);

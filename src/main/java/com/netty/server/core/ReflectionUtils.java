@@ -3,20 +3,22 @@ package com.netty.server.core;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableMap;
 import com.netty.server.exception.CreateProxyException;
 
 public class ReflectionUtils {
-
 	private static ImmutableMap.Builder<Class<?>, Object> builder = ImmutableMap
 			.builder();
 	private StringBuilder provider = new StringBuilder();
@@ -48,34 +50,34 @@ public class ReflectionUtils {
 		builder.put(long.class, Long.valueOf(0));
 	}
 
-	// 找到所有接口的类
 	public static Class<?>[] filterInterfaces(Class<?>[] proxyClasses) {
-		Set<Class<?>> interfaces = new HashSet<>();
-		for (Class<?> clazz : proxyClasses) {
-			if (clazz.isInterface()) {
-				interfaces.add(clazz);
+		Set<Class<?>> interfaces = new HashSet<Class<?>>();
+		for (Class<?> proxyClass : proxyClasses) {
+			if (proxyClass.isInterface()) {
+				interfaces.add(proxyClass);
 			}
 		}
+
 		interfaces.add(Serializable.class);
 		return interfaces.toArray(new Class[interfaces.size()]);
 	}
 
 	public static Class<?>[] filterNonInterfaces(Class<?>[] proxyClasses) {
-		Set<Class<?>> nonInterfaceSet = new HashSet<>();
-		for (Class<?> clazz : proxyClasses) {
-			if (!clazz.isInterface()) {
-				nonInterfaceSet.add(clazz);
+		Set<Class<?>> superclasses = new HashSet<Class<?>>();
+		for (Class<?> proxyClass : proxyClasses) {
+			if (!proxyClass.isInterface()) {
+				superclasses.add(proxyClass);
 			}
 		}
-		return nonInterfaceSet.toArray(new Class[nonInterfaceSet.size()]);
+
+		return superclasses.toArray(new Class[superclasses.size()]);
 	}
 
-	public static boolean existDefaultConstructor(Class<?> superClass) {
-		final Constructor<?>[] declaredConstructors = superClass
-				.getConstructors();
+	public static boolean existDefaultConstructor(Class<?> superclass) {
+		final Constructor<?>[] declaredConstructors = superclass
+				.getDeclaredConstructors();
 		for (int i = 0; i < declaredConstructors.length; i++) {
 			Constructor<?> constructor = declaredConstructors[i];
-			// 构造函数的参数为0,public或者protected开头
 			boolean exist = (constructor.getParameterTypes().length == 0 && (Modifier
 					.isPublic(constructor.getModifiers()) || Modifier
 					.isProtected(constructor.getModifiers())));
@@ -83,6 +85,7 @@ public class ReflectionUtils {
 				return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -94,18 +97,19 @@ public class ReflectionUtils {
 		case 1:
 			Class<?> superclass = parent[0];
 			if (Modifier.isFinal(superclass.getModifiers())) {
-				throw new CreateProxyException("proxy can't build"
-						+ superclass.getName() + "because it is final");
+				throw new CreateProxyException("proxy can't build "
+						+ superclass.getName() + " because it is final");
 			}
 			if (!existDefaultConstructor(superclass)) {
-				throw new CreateProxyException("proxy can't build"
+				throw new CreateProxyException("proxy can't build "
 						+ superclass.getName()
-						+ ",because it has no default constructor");
+						+ ", because it has no default constructor");
 			}
+
 			return superclass;
 		default:
 			StringBuilder errorMessage = new StringBuilder(
-					"proxy class can't buid");
+					"proxy class can't build");
 			for (int i = 0; i < parent.length; i++) {
 				Class<?> c = parent[i];
 				errorMessage.append(c.getName());
@@ -113,20 +117,19 @@ public class ReflectionUtils {
 					errorMessage.append(", ");
 				}
 			}
+
 			errorMessage.append("; multiple implement not allowed");
 			throw new CreateProxyException(errorMessage.toString());
 		}
 	}
 
 	public static boolean isHashCodeMethod(Method method) {
-		// hashCode,返回类型是hashCode,没有入参
 		return "hashCode".equals(method.getName())
 				&& Integer.TYPE.equals(method.getReturnType())
 				&& method.getParameterTypes().length == 0;
 	}
 
 	public static boolean isEqualsMethod(Method method) {
-		// 方法名称是equals,返回参数是boolean,只有一个入参,且入参类型是Object
 		return "equals".equals(method.getName())
 				&& Boolean.TYPE.equals(method.getReturnType())
 				&& method.getParameterTypes().length == 1
@@ -137,10 +140,10 @@ public class ReflectionUtils {
 		Constructor<?> constructor = null;
 		Object[] args = new Object[0];
 		try {
-			// 默认无参构造方法
 			constructor = type.getConstructor(new Class[] {});
-		} catch (NoSuchMethodException | SecurityException e) {
+		} catch (NoSuchMethodException e) {
 		}
+
 		if (constructor == null) {
 			Constructor<?>[] constructors = type.getConstructors();
 			if (constructors.length == 0) {
@@ -156,13 +159,14 @@ public class ReflectionUtils {
 
 		try {
 			return constructor.newInstance(args);
-		} catch (InstantiationException | IllegalAccessException
-				| IllegalArgumentException | InvocationTargetException e) {
-			// TODO Auto-generated catch block
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
 			e.printStackTrace();
 		}
 		return null;
-
 	}
 
 	public static Object getDefaultVal(Class<?> cl) {
@@ -178,6 +182,7 @@ public class ReflectionUtils {
 	public static Class<?> getGenericClass(ParameterizedType parameterizedType,
 			int i) {
 		Object genericClass = parameterizedType.getActualTypeArguments()[i];
+
 		if (genericClass instanceof GenericArrayType) {
 			return (Class<?>) ((GenericArrayType) genericClass)
 					.getGenericComponentType();
@@ -211,6 +216,152 @@ public class ReflectionUtils {
 	}
 
 	private void listField(Field f, boolean html) {
+		provider.append((html ? "&nbsp&nbsp" : "  ")
+				+ modifiers(f.getModifiers()) + getType(f.getType()) + " "
+				+ f.getName() + (html ? ";<br>" : ";\n"));
+	}
 
+	public void listMethod(Executable member, boolean html) {
+		provider.append(html ? "<br>&nbsp&nbsp" : "\n  "
+				+ modifiers(member.getModifiers() & (~Modifier.FINAL)));
+		if (member instanceof Method) {
+			provider.append(getType(((Method) member).getReturnType()) + " ");
+		}
+		provider.append(member.getName() + "(");
+		listTypes(member.getParameterTypes());
+		provider.append(")");
+		Class<?>[] exceptions = member.getExceptionTypes();
+		if (exceptions.length > 0) {
+			provider.append(" throws ");
+		}
+		listTypes(exceptions);
+		provider.append(";");
+	}
+
+	public void listRpcProviderDetail(Class<?> c, boolean html) {
+		if (!c.isInterface()) {
+			return;
+		} else {
+			provider.append(Modifier.toString(c.getModifiers()) + " "
+					+ c.getName());
+			provider.append(html ? " {<br>" : " {\n");
+
+			boolean hasFields = false;
+			Field[] fields = c.getDeclaredFields();
+			if (fields.length != 0) {
+				provider.append(html ? "&nbsp&nbsp//&nbspFields<br>"
+						: "  // Fields\n");
+				hasFields = true;
+				for (Field field : fields) {
+					listField(field, html);
+				}
+			}
+
+			provider.append(hasFields ? (html ? "<br>&nbsp&nbsp//&nbspMethods"
+					: "\n  // Methods") : (html ? "&nbsp&nbsp//&nbspMethods"
+					: "  // Methods"));
+			Method[] methods = c.getDeclaredMethods();
+			for (Method method : methods) {
+				listMethod(method, html);
+			}
+			provider.append(html ? "<br>}<p>" : "\n}\n\n");
+		}
+	}
+
+	public static Method getDeclaredMethod(Class<?> cls, String methodName,
+			Class<?>... parameterTypes) {
+		Method method = null;
+		Class<?> searchType = cls;
+		while (searchType != null) {
+			method = findDeclaredMethod(searchType, methodName, parameterTypes);
+			if (method != null) {
+				return method;
+			}
+			searchType = searchType.getSuperclass();
+		}
+		return method;
+	}
+
+	public static Method findDeclaredMethod(final Class<?> cls,
+			final String methodName, final Class<?>... parameterTypes) {
+		Method method = null;
+		try {
+			method = cls.getDeclaredMethod(methodName, parameterTypes);
+			return method;
+		} catch (NoSuchMethodException e) {
+			if (method == null) {
+				for (Method m : cls.getDeclaredMethods()) {
+					if (m.getName().equals(methodName)) {
+						boolean find = true;
+						Class<?>[] paramType = m.getParameterTypes();
+						if (paramType.length != parameterTypes.length) {
+							continue;
+						}
+						for (int i = 0; i < parameterTypes.length; i++) {
+							if (!paramType[i]
+									.isAssignableFrom(parameterTypes[i])) {
+								find = false;
+								break;
+							}
+						}
+						if (find) {
+							method = m;
+							break;
+						}
+					}
+				}
+			}
+		}
+		return method;
+	}
+
+	private String getClassType(Class<?>[] types) {
+		StringBuilder type = new StringBuilder();
+		for (int i = 0; i < types.length; i++) {
+			if (i > 0) {
+				type.append(", ");
+			}
+			type.append(getType(types[i]));
+		}
+		return type.toString();
+	}
+
+	public List<String> getClassMethodSignature(Class<?> cls) {
+		List<String> list = new ArrayList<String>();
+		if (cls.isInterface()) {
+			Method[] methods = cls.getDeclaredMethods();
+			StringBuilder signatureMethod = new StringBuilder();
+			for (Method member : methods) {
+				int modifiers = member.getModifiers();
+				if (Modifier.isAbstract(modifiers)
+						&& Modifier.isPublic(modifiers)) {
+					signatureMethod.append(modifiers(Modifier.PUBLIC));
+					if (Modifier.isFinal(modifiers)) {
+						signatureMethod.append(modifiers(Modifier.FINAL));
+					}
+				} else {
+					signatureMethod.append(modifiers);
+				}
+
+				if (member instanceof Method) {
+					signatureMethod.append(getType(((Method) member)
+							.getReturnType()) + " ");
+				}
+
+				signatureMethod.append(member.getName() + "(");
+				signatureMethod
+						.append(getClassType(member.getParameterTypes()));
+				signatureMethod.append(")");
+				Class<?>[] exceptions = member.getExceptionTypes();
+				if (exceptions.length > 0) {
+					signatureMethod.append(" throws ");
+				}
+				listTypes(exceptions);
+				signatureMethod.append(";");
+				list.add(signatureMethod.toString());
+				signatureMethod.delete(0, signatureMethod.length());
+			}
+		}
+		return list;
 	}
 }

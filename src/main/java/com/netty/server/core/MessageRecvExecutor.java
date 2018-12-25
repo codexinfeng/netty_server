@@ -4,10 +4,9 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
 
 import java.nio.channels.spi.SelectorProvider;
 import java.util.Iterator;
@@ -28,13 +27,15 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.netty.server.compiler.AccessAdaptiveProvider;
 import com.netty.server.model.MessageKeyVal;
 import com.netty.server.model.MessageRequest;
 import com.netty.server.model.MessageResponse;
+import com.netty.server.view.AbilityDetailProvider;
 
 public class MessageRecvExecutor implements ApplicationContextAware {
 
-	// V1 °æ±¾
+	// V1 ï¿½æ±¾
 
 	//
 
@@ -58,7 +59,6 @@ public class MessageRecvExecutor implements ApplicationContextAware {
 	// }
 	private String serverAddress;
 	private int echoApiPort;
-	// Ä¬ÈÏJDK±¾µØÐòÁÐºÅÐ­Òé
 	private RpcSerializerProtocol serializerProtocol = RpcSerializerProtocol.JDK_SERIALLZE;
 	private static final String DELIMITER = ":";
 	private static final int PARALLEL = RpcSystemConfig.PARALLEL * 2;
@@ -78,16 +78,19 @@ public class MessageRecvExecutor implements ApplicationContextAware {
 		register();
 	}
 
-	private void register() {
-//		handlerMap.put(RpcSystemConfig, value)
-	}
-
 	private static class MessageRecvExecutorHolder {
 		static final MessageRecvExecutor INSTANCE = new MessageRecvExecutor();
 	}
 
 	public static MessageRecvExecutor getInstance() {
 		return MessageRecvExecutorHolder.INSTANCE;
+	}
+
+	private void register() {
+		handlerMap.put(RpcSystemConfig.RPC_COMPILER_SPI_ATTR,
+				new AccessAdaptiveProvider());
+		handlerMap.put(RpcSystemConfig.RPC_ABILITY_DETAIL_SPI_STTR,
+				new AbilityDetailProvider());
 	}
 
 	public MessageRecvExecutor(String serverAddress, String protocol) {
@@ -104,14 +107,16 @@ public class MessageRecvExecutor implements ApplicationContextAware {
 			synchronized (MessageRecvExecutor.class) {
 				if (threadPoolExecutor == null) {
 					threadPoolExecutor = MoreExecutors
-							.listeningDecorator((ThreadPoolExecutor) RpcThreadPool
-									.getExecutor(16, -1));
+							.listeningDecorator((ThreadPoolExecutor) (RpcSystemConfig
+									.isMonitorServerSupport() ? RpcThreadPool
+									.getExecutorWithJmx(threadNums, queueNums)
+									: RpcThreadPool.getExecutor(threadNums,
+											queueNums)));
 				}
 			}
 		}
 		ListenableFuture<Boolean> listenableFuture = threadPoolExecutor
 				.submit(task);
-		// Netty·þÎñ¶Ë°Ñ¼ÆËã½á¹ûÒì²½·µ»Ø
 		Futures.addCallback(listenableFuture, new FutureCallback<Boolean>() {
 			@Override
 			public void onSuccess(Boolean result) {
@@ -134,47 +139,62 @@ public class MessageRecvExecutor implements ApplicationContextAware {
 		}, threadPoolExecutor);
 	}
 
-//	@Override
-//	public void afterPropertiesSet() throws Exception {
-//		// nettyµÄÏß³Ì³ØÄ£ÐÍÉèÖÃÎªÖ÷´ÓÏß³Ì³ØÄ£ÐÍ,Ó¦¶Ô¸ß²¢·¢
-//		// netty»¹Ö§³Öµ¥Ïß³Ì,¶àÍøÂçIO
-//		ThreadFactory threadFactory = new NameThreadFactory(
-//				"NettyRPC ThreadFactory");
-//		// java ÐéÄâ»ú¿ÉÓÃµÄ´¦ÀíÆ÷
-//		int parallel = Runtime.getRuntime().availableProcessors() * 2;
-//
-//		try {
-//			ServerBootstrap bootstrap = new ServerBootstrap();
-//			bootstrap
-//					.group(boss, worker)
-//					.channel(NioServerSocketChannel.class)
-//					.childHandler(
-//							new MessageRecvChannelInitializer(handlerMap)
-//									.buildRpcSerializeProtocol(serializerProtocol))
-//					.option(ChannelOption.SO_BACKLOG, 128)
-//					.childOption(ChannelOption.SO_KEEPALIVE, true);
-//			String[] ipAddr = serverAddress
-//					.split(MessageRecvExecutor.DELIMITER);
-//			if (ipAddr.length == 2) {
-//				String host = ipAddr[0];
-//				int port = Integer.valueOf(ipAddr[1]);
-//				ChannelFuture future = bootstrap.bind(host, port).sync();
-//				System.out.printf(
-//						"Netty RPC Server start success ip:%s port:%d\n", host,
-//						port);
-//				// ±íÊ¾Òì²½µÈ´ý
-//				future.channel().closeFuture().sync();
-//			} else {
-//				System.out.println("Netty RPC server start fail");
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		} finally {
-//			worker.shutdownGracefully();
-//			boss.shutdownGracefully();
-//		}
-//
-//	}
+	public Map<String, Object> getHandlerMap() {
+		return handlerMap;
+	}
+
+	public void setHandlerMap(Map<String, Object> handlerMap) {
+		this.handlerMap = handlerMap;
+	}
+
+	// @Override
+	// public void afterPropertiesSet() throws Exception {
+	// // nettyï¿½ï¿½ï¿½ß³Ì³ï¿½Ä£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ß³Ì³ï¿½Ä£ï¿½ï¿½,Ó¦ï¿½Ô¸ß²ï¿½ï¿½ï¿½
+	// // nettyï¿½ï¿½Ö§ï¿½Öµï¿½ï¿½ß³ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½IO
+	// ThreadFactory threadFactory = new NameThreadFactory(
+	// "NettyRPC ThreadFactory");
+	// // java ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÃµÄ´ï¿½ï¿½ï¿½ï¿½ï¿½
+	// int parallel = Runtime.getRuntime().availableProcessors() * 2;
+	//
+	// try {
+	// ServerBootstrap bootstrap = new ServerBootstrap();
+	// bootstrap
+	// .group(boss, worker)
+	// .channel(NioServerSocketChannel.class)
+	// .childHandler(
+	// new MessageRecvChannelInitializer(handlerMap)
+	// .buildRpcSerializeProtocol(serializerProtocol))
+	// .option(ChannelOption.SO_BACKLOG, 128)
+	// .childOption(ChannelOption.SO_KEEPALIVE, true);
+	// String[] ipAddr = serverAddress
+	// .split(MessageRecvExecutor.DELIMITER);
+	// if (ipAddr.length == 2) {
+	// String host = ipAddr[0];
+	// int port = Integer.valueOf(ipAddr[1]);
+	// ChannelFuture future = bootstrap.bind(host, port).sync();
+	// System.out.printf(
+	// "Netty RPC Server start success ip:%s port:%d\n", host,
+	// port);
+	// // ï¿½ï¿½Ê¾ï¿½ì²½ï¿½È´ï¿½
+	// future.channel().closeFuture().sync();
+	// } else {
+	// System.out.println("Netty RPC server start fail");
+	// }
+	// } catch (Exception e) {
+	// e.printStackTrace();
+	// } finally {
+	// worker.shutdownGracefully();
+	// boss.shutdownGracefully();
+	// }
+	//
+	// }
+	
+	public void start(){
+		ServerBootstrap bootstrap = new ServerBootstrap();
+		bootstrap.group(boss, worker)
+		.channel(NioServerSocketChannel.class)
+		
+	}
 
 	@Override
 	public void setApplicationContext(ApplicationContext ctx)

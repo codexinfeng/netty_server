@@ -1,5 +1,7 @@
 package com.netty.server.core;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
@@ -11,6 +13,8 @@ import java.util.concurrent.TimeUnit;
 
 import com.netty.server.enums.BlockingQueueType;
 import com.netty.server.enums.RejectedPolicyType;
+import com.netty.server.jmx.ThreadPoolMonitorProvider;
+import com.netty.server.jmx.ThreadPoolStatus;
 import com.netty.server.policy.AbortPolicy;
 import com.netty.server.policy.BlockingPolicy;
 import com.netty.server.policy.CallerRunspolicy;
@@ -18,12 +22,18 @@ import com.netty.server.policy.DiscardedPolicy;
 import com.netty.server.policy.RejectedPolicy;
 
 /**
- * 线程池封装
+ * 锟竭程池凤拷装
  * 
  * @author JZG
  *
  */
 public class RpcThreadPool {
+
+	private static final Timer TIMER = new Timer("ThreadPoolMonitor", true);
+
+	private static long monitorDelay = 100L;
+
+	private static long monitorPeriod = 300L;
 
 	private static RejectedExecutionHandler createPolicy() {
 
@@ -71,5 +81,25 @@ public class RpcThreadPool {
 		return new ThreadPoolExecutor(threads, threads, 0,
 				TimeUnit.MICROSECONDS, createBlockingQueue(queues),
 				new NameThreadFactory(name, true), createPolicy());
+	}
+
+	public static Executor getExecutorWithJmx(int threads, int queues) {
+		final ThreadPoolExecutor executor = (ThreadPoolExecutor) getExecutor(
+				threads, queues);
+		TIMER.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				ThreadPoolStatus status = new ThreadPoolStatus();
+				status.setPoolSize(executor.getPoolSize());
+				status.setActiveCount(executor.getActiveCount());
+				status.setCorePoolSize(executor.getCorePoolSize());
+				status.setMaximumPoolSize(executor.getMaximumPoolSize());
+				status.setLargestPoolSize(executor.getLargestPoolSize());
+				status.setTaskCount(executor.getTaskCount());
+				status.setCompletedTaskCount(executor.getCompletedTaskCount());
+			
+				ThreadPoolMonitorProvider.m
+			}
+		}, firstTime, period);
 	}
 }
