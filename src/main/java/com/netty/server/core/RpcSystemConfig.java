@@ -18,6 +18,7 @@ public class RpcSystemConfig {
 	public static final String RPC_COMPILER_SPI_ATTR = "AccessAdaptive";
 	public static final String RPC_ABILITY_DETAIL_SPI_STTR = "AbilityDetail";
 
+	public static final int IPADDR_OPRT_ARRAY_LENGTH = 2;
 	private static boolean monitorServerSupport = false;
 
 	public static boolean isMonitorServerSupport() {

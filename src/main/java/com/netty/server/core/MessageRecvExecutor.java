@@ -4,9 +4,10 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 import java.nio.channels.spi.SelectorProvider;
 import java.util.Iterator;
@@ -14,6 +15,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
@@ -188,12 +192,56 @@ public class MessageRecvExecutor implements ApplicationContextAware {
 	// }
 	//
 	// }
-	
-	public void start(){
+
+	public void start() {
 		ServerBootstrap bootstrap = new ServerBootstrap();
-		bootstrap.group(boss, worker)
-		.channel(NioServerSocketChannel.class)
-		
+		bootstrap
+				.group(boss, worker)
+				.channel(NioServerSocketChannel.class)
+				.option(ChannelOption.SO_BACKLOG, 128)
+				.childOption(ChannelOption.SO_KEEPALIVE, true)
+				.childHandler(
+						new MessageRecvChannelInitializer(handlerMap)
+								.buildRpcSerializeProtocol(serializerProtocol));
+		String[] ipAddr = serverAddress.split(MessageRecvExecutor.DELIMITER);
+		if (ipAddr.length == RpcSystemConfig.IPADDR_OPRT_ARRAY_LENGTH) {
+			final String host = ipAddr[0];
+			final int port = Integer.parseInt(ipAddr[1]);
+			ChannelFuture future = null;
+			try {
+				// 绑定主机和端口号
+				future = bootstrap.bind(host, port).sync();
+				future.addListener(new ChannelFutureListener() {
+					@Override
+					public void operationComplete(ChannelFuture future)
+							throws Exception {
+						if (future.isSuccess()) {
+							final ExecutorService executor = Executors
+									.newFixedThreadPool(numberOfEchoThreadsPool);
+							ExecutorCompletionService<Boolean> completionService = new ExecutorCompletionService<>(
+									executor);
+							 completionService.submit(new ApiE)
+							future.channel().closeFuture().sync()
+									.addListener(new ChannelFutureListener() {
+										@Override
+										public void operationComplete(
+												ChannelFuture future)
+												throws Exception {
+											executor.shutdown();
+										}
+									});
+
+						}
+					}
+				});
+
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else {
+			System.err.println("Netty Server failed");
+		}
 	}
 
 	@Override
