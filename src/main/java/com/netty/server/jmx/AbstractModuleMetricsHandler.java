@@ -8,6 +8,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -37,15 +38,36 @@ public abstract class AbstractModuleMetricsHandler extends
 	}
 
 	public ModuleMetricsVisitor visit(String moduleName, String methodName) {
-
+		try {
+			enter();
+			return visitCriticalSection(moduleName, methodName);
+		} finally {
+			exit();
+		}
 	}
 
 	@Override
 	public List<ModuleMetricsVisitor> getModuleMetricsVisitor() {
 		if (RpcSystemConfig.SYSTEM_PROPERTY_JMX_METRICS_HASH_SUPPORT) {
-            CountDownLatch latch = new CountDownLatch(1);
+			CountDownLatch latch = new CountDownLatch(1);
+			MetricsAggregationTask aggregationTask = new MetricsAggregationTask(
+					aggregationTaskFlag, tasks, visitorList, latch);
+			CyclicBarrier barrier = new CyclicBarrier(
+					METRICS_VISITOR_LIST_SIZE, aggregationTask);
+			for (int i = 0; i < METRICS_VISITOR_LIST_SIZE; i++) {
+				tasks[i] = new MetricsTask(barrier, HashModuleMetricsVisitor
+						.getInstance().getHashVisitorList().get(i));
+				executor.execute(tasks[i]);
+			}
+			visitorList.clear();
+			try {
+				latch.await();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-		return null;
+		return visitorList;
 	}
 
 	@Override
