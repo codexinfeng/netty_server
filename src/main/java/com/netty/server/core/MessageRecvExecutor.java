@@ -32,35 +32,15 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.netty.server.compiler.AccessAdaptiveProvider;
+import com.netty.server.jmx.ModuleMetricsHandler;
 import com.netty.server.model.MessageKeyVal;
 import com.netty.server.model.MessageRequest;
 import com.netty.server.model.MessageResponse;
+import com.netty.server.resolver.ApiEchoResolver;
 import com.netty.server.view.AbilityDetailProvider;
 
 public class MessageRecvExecutor implements ApplicationContextAware {
 
-	// V1 �汾
-
-	//
-
-	//
-	// private static ThreadPoolExecutor threadPoolExecutor;
-	//
-	// public MessageRecvExecutor(String serverAddress) {
-	// this.serverAddress = serverAddress;
-	// }
-	//
-	// public static void submit(Runnable task) {
-	// if (threadPoolExecutor == null) {
-	// synchronized (MessageRecvExecutor.class) {
-	// if (threadPoolExecutor == null) {
-	// threadPoolExecutor = (ThreadPoolExecutor) RpcThreadPool
-	// .getExecutor(16, -1);
-	// }
-	// }
-	// }
-	// threadPoolExecutor.submit(task);
-	// }
 	private String serverAddress;
 	private int echoApiPort;
 	private RpcSerializerProtocol serializerProtocol = RpcSerializerProtocol.JDK_SERIALLZE;
@@ -151,48 +131,6 @@ public class MessageRecvExecutor implements ApplicationContextAware {
 		this.handlerMap = handlerMap;
 	}
 
-	// @Override
-	// public void afterPropertiesSet() throws Exception {
-	// // netty���̳߳�ģ������Ϊ�����̳߳�ģ��,Ӧ�Ը߲���
-	// // netty��֧�ֵ��߳�,������IO
-	// ThreadFactory threadFactory = new NameThreadFactory(
-	// "NettyRPC ThreadFactory");
-	// // java ��������õĴ�����
-	// int parallel = Runtime.getRuntime().availableProcessors() * 2;
-	//
-	// try {
-	// ServerBootstrap bootstrap = new ServerBootstrap();
-	// bootstrap
-	// .group(boss, worker)
-	// .channel(NioServerSocketChannel.class)
-	// .childHandler(
-	// new MessageRecvChannelInitializer(handlerMap)
-	// .buildRpcSerializeProtocol(serializerProtocol))
-	// .option(ChannelOption.SO_BACKLOG, 128)
-	// .childOption(ChannelOption.SO_KEEPALIVE, true);
-	// String[] ipAddr = serverAddress
-	// .split(MessageRecvExecutor.DELIMITER);
-	// if (ipAddr.length == 2) {
-	// String host = ipAddr[0];
-	// int port = Integer.valueOf(ipAddr[1]);
-	// ChannelFuture future = bootstrap.bind(host, port).sync();
-	// System.out.printf(
-	// "Netty RPC Server start success ip:%s port:%d\n", host,
-	// port);
-	// // ��ʾ�첽�ȴ�
-	// future.channel().closeFuture().sync();
-	// } else {
-	// System.out.println("Netty RPC server start fail");
-	// }
-	// } catch (Exception e) {
-	// e.printStackTrace();
-	// } finally {
-	// worker.shutdownGracefully();
-	// boss.shutdownGracefully();
-	// }
-	//
-	// }
-
 	public void start() {
 		ServerBootstrap bootstrap = new ServerBootstrap();
 		bootstrap
@@ -220,7 +158,16 @@ public class MessageRecvExecutor implements ApplicationContextAware {
 									.newFixedThreadPool(numberOfEchoThreadsPool);
 							ExecutorCompletionService<Boolean> completionService = new ExecutorCompletionService<>(
 									executor);
-							 completionService.submit(new ApiE)
+							completionService.submit(new ApiEchoResolver(host,
+									echoApiPort));
+							System.out
+									.printf("[author tangjie] Netty RPC Server start success!\nip:%s\nport:%d\nprotocol:%s\nstart-time:%s\njmx-invoke-metrics:%s\n\n",
+											host,
+											port,
+											serializerProtocol,
+											ModuleMetricsHandler.getStartTime(),
+											(RpcSystemConfig.SYSTEM_PROPERTY_JMX_METRICS_SUPPORT ? "open"
+													: "close"));
 							future.channel().closeFuture().sync()
 									.addListener(new ChannelFutureListener() {
 										@Override
@@ -265,6 +212,35 @@ public class MessageRecvExecutor implements ApplicationContextAware {
 					MessageRecvExecutor.class.getName()).log(Level.SEVERE,
 					null, e);
 		}
+	}
+
+	public void stop() {
+		worker.shutdownGracefully();
+		boss.shutdownGracefully();
+	}
+
+	public String getServerAddress() {
+		return serverAddress;
+	}
+
+	public void setServerAddress(String serverAddress) {
+		this.serverAddress = serverAddress;
+	}
+
+	public int getEchoApiPort() {
+		return echoApiPort;
+	}
+
+	public void setEchoApiPort(int echoApiPort) {
+		this.echoApiPort = echoApiPort;
+	}
+
+	public RpcSerializerProtocol getSerializerProtocol() {
+		return serializerProtocol;
+	}
+
+	public void setSerializerProtocol(RpcSerializerProtocol serializerProtocol) {
+		this.serializerProtocol = serializerProtocol;
 	}
 
 }

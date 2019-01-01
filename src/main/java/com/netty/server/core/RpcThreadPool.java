@@ -1,5 +1,6 @@
 package com.netty.server.core;
 
+import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -10,6 +11,11 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.MalformedObjectNameException;
+import javax.management.ReflectionException;
 
 import com.netty.server.enums.BlockingQueueType;
 import com.netty.server.enums.RejectedPolicyType;
@@ -97,9 +103,27 @@ public class RpcThreadPool {
 				status.setLargestPoolSize(executor.getLargestPoolSize());
 				status.setTaskCount(executor.getTaskCount());
 				status.setCompletedTaskCount(executor.getCompletedTaskCount());
-			
-				ThreadPoolMonitorProvider.m
+
+				try {
+					ThreadPoolMonitorProvider.monitor(status);
+				} catch (MalformedObjectNameException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InstanceNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (MBeanException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ReflectionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
-		}, firstTime, period);
+		}, monitorDelay, monitorPeriod);
+		return executor;
 	}
 }

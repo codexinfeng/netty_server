@@ -25,6 +25,25 @@ public class RpcSystemConfig {
 			.getInteger("nettyrpc.jmx.metrics.hash.nums", 8);
 	public static final boolean SYSTEM_PROPERTY_JMX_METRICS_HASH_SUPPORT = RpcSystemConfig.SYSTEM_PROPERTY_JMX_METRICS_HASH_NUMS != 1;
 	public static final int IPADDR_OPRT_ARRAY_LENGTH = 2;
+	public static final long SYSTEM_PROPERTY_MESSAGE_CALLBACK_TIMEOUT = Long
+			.getLong("nettyrpc.default.msg.timeout", 30 * 1000L);
+	public static final long SYSTEM_PROPERTY_ASYNC_MESSAGE_CALLBACK_TIMEOUT = Long
+			.getLong("nettyrpc.default.asyncmsg.timeout", 60 * 1000L);
+	public static final int SYSTEM_PROPERTY_THREADPOOL_QUEUE_NUMS = Integer
+			.getInteger("nettyrpc.default.queue.nums", -1);
+	public static final int SYSTEM_PROPERTY_CLIENT_RECONNECT_DELAY = Integer
+			.parseInt(System.getProperty(
+					"nettyrpc.default.client.reconnect.delay", "10"));
+	public static final int SYSTEM_PROPERTY_JMX_METRICS_LOCK_FAIR = Integer
+			.getInteger("nettyrpc.jmx.metrics.lock.fair", 0);
+	public static final String RPC_ABILITY_DETAIL_SPI_ATTR = "com.newlandframework.rpc.core.AbilityDetail";
+	public static final String FILTER_RESPONSE_MSG = "Illegal request,NettyRPC server refused to respond!";
+	public static final String TIMEOUT_RESPONSE_MSG = "Timeout request,NettyRPC server request timeout!";
+	public static final int SERIALIZE_POOL_MAX_TOTAL = 500;
+	public static final int SERIALIZE_POOL_MIN_IDLE = 10;
+	public static final int SERIALIZE_POOL_MAX_WAIT_MILLIS = 5000;
+	public static final int SERIALIZE_POOL_MIN_EVICTABLE_IDLE_TIME_MILLIS = 600000;
+
 	private static boolean monitorServerSupport = false;
 
 	public static boolean isMonitorServerSupport() {

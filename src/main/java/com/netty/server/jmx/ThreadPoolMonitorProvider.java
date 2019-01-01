@@ -58,7 +58,16 @@ public class ThreadPoolMonitorProvider {
 	public ConnectorServerFactoryBean connectorServer()
 			throws MalformedObjectNameException {
 		MessageRecvExecutor ref = MessageRecvExecutor.getInstance();
-		String ipAddr = StringUtils.isNotEmpty(ref.get)
+		String ipAddr = StringUtils.isNotEmpty(ref.getServerAddress()) ? StringUtils
+				.substringBeforeLast(ref.getServerAddress(), DELIMITER)
+				: "localhost";
+		url = "service:jmx:rmi://" + ipAddr + "/jndi/rmi://" + ipAddr
+				+ ":1099/nettyrpcstatus";
+		System.out.println("NettyRPC JMX monitorURL :[" + url + "]");
+		ConnectorServerFactoryBean connectorFactoryBean = new ConnectorServerFactoryBean();
+		connectorFactoryBean.setObjectName("connector:name=rmi");
+		connectorFactoryBean.setServiceUrl(url);
+		return connectorFactoryBean;
 
 	}
 

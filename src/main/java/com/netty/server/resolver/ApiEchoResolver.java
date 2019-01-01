@@ -12,7 +12,6 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
 
-import java.nio.channels.ClosedChannelException;
 import java.util.concurrent.Callable;
 
 public class ApiEchoResolver implements Callable<Boolean> {
@@ -31,22 +30,23 @@ public class ApiEchoResolver implements Callable<Boolean> {
 		EventLoopGroup bossGroup = new NioEventLoopGroup(1);
 		EventLoopGroup workerGroup = new NioEventLoopGroup();
 		SslContext sslCtx = null;
-		//ssl链接是什么
+		// ssl链接是什么
 		if (SSL) {
 			SelfSignedCertificate ssc = new SelfSignedCertificate();
 			sslCtx = SslContextBuilder.forServer(ssc.certificate(),
 					ssc.privateKey()).build();
 		}
 		ServerBootstrap b = new ServerBootstrap();
-		b.option(ChannelOption.SO_BACKLOG, 1024)
-		.group(bossGroup,workerGroup)
-		.channel(NioServerSocketChannel.class)
-//		.handler(new LoggingHandler(LogLevel.INFO))
-		.childHandler(childHandler)
-		ChannelFuture f = b.bind(host,port).sync();
+		b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
+				.option(ChannelOption.SO_BACKLOG, 1024)
+				.handler(new LoggingHandler(LogLevel.INFO))
+				.childHandler(new ApiEchoInitializer(sslCtx));
+		ChannelFuture f = b.bind(host, port).sync();
+		System.err
+				.println(("You can open your web browser see NettyRPC server api interface: "
+						+ (SSL ? "https" : "http") + "://" + host + ":" + port + "/NettyRPC.html"));
 		f.channel().closeFuture().sync();
-		
-		return null;
-	}
 
+		return Boolean.TRUE;
+	}
 }
