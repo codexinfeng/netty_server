@@ -44,6 +44,7 @@ public class InvokeSuccObserver extends AbstractInvokeObserve {
 					.fetchEvent(
 							AbstractInvokeEventBus.ModuleEvent.INVOKE_MIN_TIMESPAN_EVENT)
 					.notify(super.getVisitor().getInvokeMinTimespan(),
+							invokeTimespan);
 		}
 
 	}
