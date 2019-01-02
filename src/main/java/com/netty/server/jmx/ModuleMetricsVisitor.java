@@ -197,6 +197,10 @@ public class ModuleMetricsVisitor {
 		this.invokeFailCountUpdater.set(this, invokeFailCount);
 	}
 
+	public long incrementInvokeFailCount() {
+		return this.invokeFailCountUpdater.incrementAndGet(this);
+	}
+
 	public long getInvokeFilterCount() {
 		return this.invokeFilterCountUpdater.get(this);
 	}

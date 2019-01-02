@@ -17,7 +17,16 @@ public class Test {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		};
-		LockSupport.park(Test.class);
+//		LockSupport.park(Test.class);
+		int a = 3;
+		int b = 0;
+		if(a==3&&b==0){
+			System.out.println("aa");
+		}else if(a==3){
+			System.out.println("bb");
+		}else{
+			System.out.println("cc");
+		}
 
 	}
 
