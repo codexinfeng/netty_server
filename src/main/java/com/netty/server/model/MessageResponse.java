@@ -1,23 +1,29 @@
 package com.netty.server.model;
 
-import java.io.Serializable;
-
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 
-public class MessageResponse  {
+public class MessageResponse {
 
 	/**
 	 * 
 	 */
-//	private static final long serialVersionUID = 3800819758626036488L;
+	// private static final long serialVersionUID = 3800819758626036488L;
 
 	private String messageId;
 
 	private String error;
 
 	private Object resultDesc;
+
+	private boolean returnNotNull;
+
+	public boolean isReturnNotNull() {
+		return returnNotNull;
+	}
+
+	public void setReturnNotNull(boolean returnNotNull) {
+		this.returnNotNull = returnNotNull;
+	}
 
 	public String getMessageId() {
 		return messageId;
