@@ -4,8 +4,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import com.netty.server.core.MessageRecvExecutor;
 import com.netty.server.core.ReflectionUtils;
+import com.netty.server.netty.MessageRecvExecutor;
 
 public class AbilityDetailProvider implements AbilityDetail {
 	private final static String STYLE = "<style type=\"text/css\">\n"

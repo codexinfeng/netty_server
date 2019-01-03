@@ -19,9 +19,9 @@ import com.netty.server.spring.BeanFactoryUtils;
 public abstract class AbstractMessageRecvInitializeTask implements
 		Callable<Boolean> {
 
-	private MessageRequest request = null;
-	private MessageResponse response = null;
-	private Map<String, Object> handlerMap = null;
+	protected MessageRequest request = null;
+	protected MessageResponse response = null;
+	protected Map<String, Object> handlerMap = null;
 	protected static final String METHOD_MAPPED_NAME = "invoke";
 	protected boolean returnNotNull = true;
 	protected long invokeTimespan;

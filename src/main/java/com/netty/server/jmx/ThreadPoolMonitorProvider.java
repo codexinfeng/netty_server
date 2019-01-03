@@ -20,7 +20,7 @@ import org.springframework.jmx.support.MBeanServerConnectionFactoryBean;
 import org.springframework.jmx.support.MBeanServerFactoryBean;
 import org.springframework.remoting.rmi.RmiRegistryFactoryBean;
 
-import com.netty.server.core.MessageRecvExecutor;
+import com.netty.server.netty.MessageRecvExecutor;
 
 @Configuration
 @EnableMBeanExport

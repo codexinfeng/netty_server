@@ -1,10 +1,12 @@
-package com.netty.server.core;
+package com.netty.server.netty;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 
 import java.util.Map;
+
+import com.netty.server.enums.RpcSerializerProtocol;
 
 public class MessageRecvChannelInitializer extends
 		ChannelInitializer<SocketChannel> {

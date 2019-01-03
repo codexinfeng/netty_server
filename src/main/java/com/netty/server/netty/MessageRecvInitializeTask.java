@@ -1,4 +1,4 @@
-package com.netty.server.core;
+package com.netty.server.netty;
 
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;

@@ -29,8 +29,8 @@ import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.iterators.FilterIterator;
 import org.apache.commons.lang3.StringUtils;
 
-import com.netty.server.core.MessageRecvExecutor;
 import com.netty.server.core.RpcSystemConfig;
+import com.netty.server.netty.MessageRecvExecutor;
 import com.netty.server.parallel.AbstractDaemonThread;
 import com.netty.server.parallel.SemaphoreWrapper;
 

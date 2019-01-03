@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.netty.server.core.MessageRecvExecutor;
 import com.netty.server.core.ReflectionUtils;
 import com.netty.server.core.RpcSystemConfig;
+import com.netty.server.netty.MessageRecvExecutor;
 
 public class HashModuleMetricsVisitor {
 	private List<List<ModuleMetricsVisitor>> hashVisitorList = new ArrayList<>();
@@ -54,19 +54,18 @@ public class HashModuleMetricsVisitor {
 			}
 		}
 	}
-	
-	public void signal(){
-//		ModuleMetricsHandler
+
+	public void signal() {
+		// ModuleMetricsHandler
 	}
 
 	public List<List<ModuleMetricsVisitor>> getHashVisitorList() {
 		return hashVisitorList;
 	}
 
-	public void setHashVisitorList(List<List<ModuleMetricsVisitor>> hashVisitorList) {
+	public void setHashVisitorList(
+			List<List<ModuleMetricsVisitor>> hashVisitorList) {
 		this.hashVisitorList = hashVisitorList;
 	}
-	
-	
 
 }

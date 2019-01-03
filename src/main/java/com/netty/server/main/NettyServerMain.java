@@ -1,5 +1,8 @@
 package com.netty.server.main;
 
+import io.netty.channel.nio.NioEventLoop;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -12,6 +15,5 @@ public class NettyServerMain {
 				"classpath:rpc-invoke-config-kryo.xml");
 		System.out.println("rpc server");
 
-	
 	}
 }

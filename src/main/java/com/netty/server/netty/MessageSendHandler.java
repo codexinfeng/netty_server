@@ -1,4 +1,4 @@
-package com.netty.server.core;
+package com.netty.server.netty;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -9,6 +9,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import java.net.SocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.netty.server.core.MessageCallBack;
 import com.netty.server.model.MessageRequest;
 import com.netty.server.model.MessageResponse;
 
@@ -39,9 +40,9 @@ public class MessageSendHandler extends ChannelInboundHandlerAdapter {
 		String messageId = response.getMessageId();
 		MessageCallBack callBack = mapCallBack.get(messageId);
 		if (callBack != null) {
-			// mapÀïÃæÈ¥³ý
+			// mapï¿½ï¿½ï¿½ï¿½È¥ï¿½ï¿½
 			mapCallBack.remove(messageId);
-			// ·¢³ösignal,²»ÓÃÔÙµÈ´ý
+			// ï¿½ï¿½ï¿½ï¿½signal,ï¿½ï¿½ï¿½ï¿½ï¿½ÙµÈ´ï¿½
 			callBack.over(response);
 		}
 	}

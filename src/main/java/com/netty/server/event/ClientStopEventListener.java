@@ -1,6 +1,6 @@
 package com.netty.server.event;
 
-import com.netty.server.core.MessageSendExecutor;
+import com.netty.server.netty.MessageSendExecutor;
 
 public class ClientStopEventListener {
 

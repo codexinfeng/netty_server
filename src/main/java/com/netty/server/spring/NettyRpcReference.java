@@ -5,10 +5,10 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
 import com.google.common.eventbus.EventBus;
-import com.netty.server.core.MessageSendExecutor;
-import com.netty.server.core.RpcSerializerProtocol;
+import com.netty.server.enums.RpcSerializerProtocol;
 import com.netty.server.event.ClientStopEvent;
 import com.netty.server.event.ClientStopEventListener;
+import com.netty.server.netty.MessageSendExecutor;
 
 public class NettyRpcReference implements FactoryBean<Object>,
 		InitializingBean, DisposableBean {

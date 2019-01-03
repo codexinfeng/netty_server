@@ -1,15 +1,17 @@
-package com.netty.server.core;
+package com.netty.server.netty;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 
+import com.netty.server.enums.RpcSerializerProtocol;
+
 public class MessageSendChannelInitializer extends
 		ChannelInitializer<SocketChannel> {
 
-	// V1°æ±¾
-	// ObjectDecoder µ×²ãÄ¬ÈÏ¼Ì³Ð°ë°ü½âÂëÆ÷ LengthFieldBaseFrameDecoder´¦ÀíÕ³°üÎÊÌâ
-	// ÏûÏ¢Í·Õ¼4¸ö×Ö½Ú
+	// V1ï¿½æ±¾
+	// ObjectDecoder ï¿½×²ï¿½Ä¬ï¿½Ï¼Ì³Ð°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ LengthFieldBaseFrameDecoderï¿½ï¿½ï¿½ï¿½Õ³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	// ï¿½ï¿½Ï¢Í·Õ¼4ï¿½ï¿½ï¿½Ö½ï¿½
 	// public final static int MESSAGE_LENGTH = 4;
 	//
 	// @Override
@@ -21,7 +23,8 @@ public class MessageSendChannelInitializer extends
 	// pipeline.addLast(new LengthFieldPrepender(
 	// MessageSendChannelInitializer.MESSAGE_LENGTH));
 	// pipeline.addLast(new ObjectEncoder());
-	// // ¿¼ÂÇµ½²¢·¢ÐÔÄÜ,²ÉÓÃweakCachingConcurrentResolver»º´æ²ßÂÔ,Ò»°ãÇé¿öÊ¹ÓÃcacheDisabled
+	// //
+	// ï¿½ï¿½ï¿½Çµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½weakCachingConcurrentResolverï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½cacheDisabled
 	// pipeline.addLast(new ObjectDecoder(Integer.MAX_VALUE,
 	// ClassResolvers.weakCachingConcurrentResolver(this.getClass()
 	// .getClassLoader())));

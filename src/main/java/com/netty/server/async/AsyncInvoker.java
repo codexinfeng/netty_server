@@ -9,8 +9,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import com.netty.server.core.ReflectionUtils;
 import com.netty.server.core.RpcSystemConfig;
-import com.netty.server.core.RpcThreadPool;
 import com.netty.server.exception.AsyncCallException;
+import com.netty.server.parallel.RpcThreadPool;
 
 public class AsyncInvoker {
 	private ThreadPoolExecutor executor = (ThreadPoolExecutor) RpcThreadPool

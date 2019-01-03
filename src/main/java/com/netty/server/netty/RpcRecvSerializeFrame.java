@@ -1,4 +1,4 @@
-package com.netty.server.core;
+package com.netty.server.netty;
 
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
@@ -9,6 +9,7 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 
 import java.util.Map;
 
+import com.netty.server.enums.RpcSerializerProtocol;
 import com.netty.server.serialize.support.MessageCodeUtil;
 import com.netty.server.serialize.support.RpcSerializeFrame;
 import com.netty.server.serialize.support.hessian.HessianCodeUtil;
@@ -27,7 +28,7 @@ public class RpcRecvSerializeFrame implements RpcSerializeFrame {
 		this.handlerMap = handlerMap;
 	}
 
-	// ºóÐø¿ÉÒÔÓÅ»¯³ÉÍ¨¹ýspring ioc·½Ê½×¢Èë
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å»ï¿½ï¿½ï¿½Í¨ï¿½ï¿½spring iocï¿½ï¿½Ê½×¢ï¿½ï¿½
 	@Override
 	public void select(RpcSerializerProtocol protocol, ChannelPipeline pipeline) {
 		switch (protocol) {

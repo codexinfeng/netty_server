@@ -1,10 +1,10 @@
-package com.netty.server.core;
+package com.netty.server.parallel;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 线程工厂(自己生产线程的工厂)
+ * 锟竭程癸拷锟斤拷(锟皆硷拷锟斤拷锟斤拷锟竭程的癸拷锟斤拷)
  * 
  * @author JZG
  *

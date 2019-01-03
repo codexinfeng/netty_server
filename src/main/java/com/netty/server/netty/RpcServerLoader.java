@@ -1,4 +1,4 @@
-package com.netty.server.core;
+package com.netty.server.netty;
 
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -16,6 +16,8 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.netty.server.enums.RpcSerializerProtocol;
+import com.netty.server.parallel.RpcThreadPool;
 
 public class RpcServerLoader {
 
@@ -26,7 +28,7 @@ public class RpcServerLoader {
 	@SuppressWarnings("unused")
 	private RpcSerializerProtocol serializeProtocol = RpcSerializerProtocol.JDK_SERIALLZE;
 
-	// Java ÐéÄâ»ú¿ÉÓÃ´¦ÀíÆ÷ÊýÁ¿
+	// Java ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	private final static int parallel = Runtime.getRuntime()
 			.availableProcessors();
 	private EventLoopGroup eventLoopGroup = new NioEventLoopGroup(parallel);
@@ -36,7 +38,7 @@ public class RpcServerLoader {
 	private Lock lock = new ReentrantLock();
 	private Condition connectStatus = lock.newCondition();
 	private Condition handlerStatus = lock.newCondition();
-	// V1°æ±¾
+	// V1ï¿½æ±¾
 	// private static ThreadPoolExecutor threadPoolExecutor =
 	// (ThreadPoolExecutor) RpcThreadPool
 	// .getExecutor(16, -1);
@@ -46,7 +48,7 @@ public class RpcServerLoader {
 	private RpcServerLoader() {
 	}
 
-	// µ¥ÀýÄ£Ê½
+	// ï¿½ï¿½ï¿½ï¿½Ä£Ê½
 	public static RpcServerLoader getInstance() {
 		if (rpcServerLoader == null) {
 			synchronized (RpcServerLoader.class) {
@@ -66,13 +68,13 @@ public class RpcServerLoader {
 			int port = Integer.valueOf(ipAddr[1]);
 			final InetSocketAddress remoteAddr = new InetSocketAddress(host,
 					port);
-			// V1°æ±¾
+			// V1ï¿½æ±¾
 			// threadPoolExecutor.submit(new MessageSendInitializeTask(
 			// eventLoopGroup, remoteAddr, serializeProtocol));
 			ListenableFuture<Boolean> listenableFuture = threadPoolExecutor
 					.submit(new MessageSendInitializeCallTask(eventLoopGroup,
 							remoteAddr, serializeProtocol));
-			// ¼àÌýÏß³Ì³ØÒì²½µÄÖ´ÐÐ½á¹û³É¹¦Óë·ñ»½ÐÑÈ«²¿µÄ¿Í»§¶ËRPCÏß³Ì
+			// ï¿½ï¿½ï¿½ï¿½ï¿½ß³Ì³ï¿½ï¿½ì²½ï¿½ï¿½Ö´ï¿½Ð½ï¿½ï¿½ï¿½É¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È«ï¿½ï¿½ï¿½Ä¿Í»ï¿½ï¿½ï¿½RPCï¿½ß³ï¿½
 			Futures.addCallback(listenableFuture,
 					new FutureCallback<Boolean>() {
 
@@ -83,7 +85,7 @@ public class RpcServerLoader {
 								if (messageSendHandler == null) {
 									handlerStatus.await();
 								}
-								// FutureÒì²½»Øµ÷,»·ÐÎËùÓÐrpcµÈ´ýÏß³Ì
+								// Futureï¿½ì²½ï¿½Øµï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½rpcï¿½È´ï¿½ï¿½ß³ï¿½
 								if (result == Boolean.TRUE
 										&& messageSendHandler != null) {
 									connectStatus.signalAll();
@@ -110,7 +112,7 @@ public class RpcServerLoader {
 		try {
 			lock.lock();
 			this.messageSendHandler = messageSendHandler;
-			// »½ÐÑËùÓÐµÈ´ý¿Í»§¶ËRPCÏß³Ì
+			// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÐµÈ´ï¿½ï¿½Í»ï¿½ï¿½ï¿½RPCï¿½ß³ï¿½
 			handlerStatus.signal();
 		} finally {
 			lock.unlock();
@@ -121,7 +123,7 @@ public class RpcServerLoader {
 			throws InterruptedException {
 		try {
 			lock.lock();
-			// Netty·þÎñ¶ËÁ´Â·Ã»ÓÐ½¨Á¢Íê±ÏÖ®Ç°,ÏÈ¹ÒÆðµÈ´ý
+			// Nettyï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â·Ã»ï¿½Ð½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö®Ç°,ï¿½È¹ï¿½ï¿½ï¿½È´ï¿½
 			if (messageSendHandler == null) {
 				connectStatus.await();
 			}

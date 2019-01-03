@@ -7,10 +7,10 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 
-import com.netty.server.core.MessageRecvExecutor;
 import com.netty.server.event.ServerStartEvent;
 import com.netty.server.filter.Filter;
 import com.netty.server.filter.ServiceFilterBinder;
+import com.netty.server.netty.MessageRecvExecutor;
 
 public class NettyRpcService implements ApplicationContextAware,
 		ApplicationListener<ApplicationEvent> {

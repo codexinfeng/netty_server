@@ -1,4 +1,4 @@
-package com.netty.server.core;
+package com.netty.server.enums;
 
 public enum RpcSerializerProtocol {
 

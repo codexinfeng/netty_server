@@ -1,4 +1,4 @@
-package com.netty.server.core;
+package com.netty.server.netty;
 
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
@@ -7,6 +7,7 @@ import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 
+import com.netty.server.enums.RpcSerializerProtocol;
 import com.netty.server.serialize.support.MessageCodeUtil;
 import com.netty.server.serialize.support.RpcSerializeFrame;
 import com.netty.server.serialize.support.hessian.HessianCodeUtil;

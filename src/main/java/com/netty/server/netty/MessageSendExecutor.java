@@ -1,16 +1,17 @@
-package com.netty.server.core;
+package com.netty.server.netty;
 
 import com.google.common.reflect.Reflection;
+import com.netty.server.enums.RpcSerializerProtocol;
 
 /**
- * ¿Í»§¶ËÏûÏ¢·¢ËÍ
+ * ï¿½Í»ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½
  * 
  * @author JZG
  *
  */
 public class MessageSendExecutor {
 
-	// µ¥ÀýÄ£Ê½
+	// ï¿½ï¿½ï¿½ï¿½Ä£Ê½
 	private static class MessageSendExecutorSingle {
 		private static final MessageSendExecutor sendExecutor = new MessageSendExecutor();
 	}
@@ -43,7 +44,7 @@ public class MessageSendExecutor {
 	}
 
 	// V1
-	// ´´½¨rpcInterfaceÀàµÄ´úÀí£¨¶¯Ì¬´´½¨´úÀí£©
+	// ï¿½ï¿½ï¿½ï¿½rpcInterfaceï¿½ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	// @SuppressWarnings("unchecked")
 	// public static <T> T execute(Class<T> rpcInterface) {
 	// return (T) Proxy.newProxyInstance(rpcInterface.getClassLoader(),

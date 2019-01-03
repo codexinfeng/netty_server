@@ -1,4 +1,4 @@
-package com.netty.server.core;
+package com.netty.server.parallel;
 
 import java.io.IOException;
 import java.util.Timer;
@@ -17,6 +17,7 @@ import javax.management.MBeanException;
 import javax.management.MalformedObjectNameException;
 import javax.management.ReflectionException;
 
+import com.netty.server.core.RpcSystemConfig;
 import com.netty.server.enums.BlockingQueueType;
 import com.netty.server.enums.RejectedPolicyType;
 import com.netty.server.jmx.ThreadPoolMonitorProvider;

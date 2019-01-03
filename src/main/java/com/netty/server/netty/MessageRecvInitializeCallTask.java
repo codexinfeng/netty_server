@@ -1,4 +1,4 @@
-package com.netty.server.core;
+package com.netty.server.netty;
 
 import java.util.Map;
 import java.util.concurrent.Callable;

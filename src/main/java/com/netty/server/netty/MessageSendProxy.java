@@ -1,14 +1,15 @@
-package com.netty.server.core;
+package com.netty.server.netty;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.UUID;
 
+import com.netty.server.core.MessageCallBack;
 import com.netty.server.model.MessageRequest;
 
 public class MessageSendProxy<T> implements InvocationHandler {
 
-	// V1 �汾
+	// V1 �汾
 	// private Class<T> cls;
 	//
 	// public MessageSendProxy(Class<T> cls) {
