@@ -4,6 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import com.netty.server.model.MessageRequest;
 import com.netty.server.model.MessageResponse;
@@ -25,8 +26,13 @@ public class MessageRecvHandler extends ChannelInboundHandlerAdapter {
 		// MessageRecvExecutor.submit(recvTask);
 		// MessageRecvExecutor.submit(task, ctx, request, response);
 
-		MessageRecvInitializeCallTask recvTask = new MessageRecvInitializeCallTask(
-				request, response, handlerMap);
+		// MessageRecvInitializeCallTask recvTask = new
+		// MessageRecvInitializeCallTask(
+		// request, response, handlerMap);
+		// MessageRecvExecutor.submit(recvTask, ctx, request, response);
+		RecvInitializeTaskFacade facade = new RecvInitializeTaskFacade(request,
+				response, handlerMap);
+		Callable<Boolean> recvTask = facade.getTask();
 		MessageRecvExecutor.submit(recvTask, ctx, request, response);
 	}
 

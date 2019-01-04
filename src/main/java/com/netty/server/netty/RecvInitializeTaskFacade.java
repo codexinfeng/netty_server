@@ -23,13 +23,14 @@ public class RecvInitializeTaskFacade {
 	}
 
 	public Callable<Boolean> getTask() {
-		return null;
+		return isMetrics ? getMetricsTask()
+				: new MessageRecvInitializeTaskAdapter(request, response,
+						handlerMap);
 	}
 
 	public Callable<Boolean> getMetricsTask() {
-		// return jmxMetricsHash ? new HashMessageRecvInitializeTask(request,
-		// response, handlerMap) : new MessageRecvInitializeTask(request,
-		// response, handlerMap);
-		return null;
+		return jmxMetricsHash ? new HashMessageRecvInitializeTask(request,
+				response, handlerMap) : new MessageRecvInitializeTask(request,
+				response, handlerMap);
 	}
 }

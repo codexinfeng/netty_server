@@ -11,7 +11,6 @@ import com.netty.server.enums.RpcSerializerProtocol;
  */
 public class MessageSendExecutor {
 
-	// ����ģʽ
 	private static class MessageSendExecutorSingle {
 		private static final MessageSendExecutor sendExecutor = new MessageSendExecutor();
 	}

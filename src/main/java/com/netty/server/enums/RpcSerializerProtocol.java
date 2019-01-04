@@ -3,7 +3,7 @@ package com.netty.server.enums;
 public enum RpcSerializerProtocol {
 
 	JDK_SERIALLZE("jdknative"), KRYO_SERIALIZE("kryo"), HESSIAN_SERIALIZE(
-			"hessian");
+			"hessian"), PROTOSTUFFSERIALIZE("protostuff");
 	private String serializeProtocol;
 
 	private RpcSerializerProtocol(String serializeProtocol) {

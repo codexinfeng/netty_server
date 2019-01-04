@@ -40,9 +40,7 @@ public class MessageSendHandler extends ChannelInboundHandlerAdapter {
 		String messageId = response.getMessageId();
 		MessageCallBack callBack = mapCallBack.get(messageId);
 		if (callBack != null) {
-			// map����ȥ��
 			mapCallBack.remove(messageId);
-			// ����signal,�����ٵȴ�
 			callBack.over(response);
 		}
 	}

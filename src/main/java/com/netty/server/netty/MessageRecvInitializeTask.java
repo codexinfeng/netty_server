@@ -1,81 +1,96 @@
 package com.netty.server.netty;
 
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
-
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
-import org.apache.commons.lang3.reflect.MethodUtils;
-
+import com.netty.server.core.ReflectionUtils;
+import com.netty.server.event.InvokeEventBusFacade;
+import com.netty.server.event.InvokeEventWatcher;
+import com.netty.server.event.InvokeFailObserver;
+import com.netty.server.event.InvokeFilterObserver;
+import com.netty.server.event.InvokeObserver;
+import com.netty.server.event.AbstractInvokeEventBus.ModuleEvent;
+import com.netty.server.event.InvokeSuccObserver;
+import com.netty.server.filter.ServiceFilterBinder;
+import com.netty.server.jmx.ModuleMetricsHandler;
+import com.netty.server.jmx.ModuleMetricsVisitor;
 import com.netty.server.model.MessageRequest;
 import com.netty.server.model.MessageResponse;
+import com.netty.server.parallel.SemaphoreWrapperFactory;
 
-public class MessageRecvInitializeTask implements Runnable {
-
-	private MessageRequest request = null;
-
-	private MessageResponse response = null;
-
-	private Map<String, Object> handlerMap = null;
-
-	private ChannelHandlerContext ctx = null;
+public class MessageRecvInitializeTask extends
+		AbstractMessageRecvInitializeTask {
+	private AtomicReference<ModuleMetricsVisitor> visitor = new AtomicReference<>();
+	private AtomicReference<InvokeEventBusFacade> facade = new AtomicReference<>();
+	private AtomicReference<InvokeEventWatcher> watcher = new AtomicReference<>(
+			new InvokeEventWatcher());
+	private SemaphoreWrapperFactory factory = SemaphoreWrapperFactory
+			.getInstance();
 
 	public MessageRecvInitializeTask(MessageRequest request,
-			MessageResponse response, Map<String, Object> handlerMap,
-			ChannelHandlerContext ctx) {
-		this.request = request;
-		this.response = response;
-		this.handlerMap = handlerMap;
-		this.ctx = ctx;
+			MessageResponse response, Map<String, Object> handlerMap) {
+		super(request, response, handlerMap);
 	}
 
 	@Override
-	public void run() {
-		response.setMessageId(request.getMessageId());
-		try {
-			Object result = reflect(request);
-			response.setResultDesc(result);
-		} catch (Exception e) {
-			response.setError(e.getMessage());
-			e.printStackTrace();
-			System.err.println("RPC Server invoke error!\n");
+	protected void injectInvoke() {
+		Class<?> cls = handlerMap.get(request.getClassName()).getClass();
+		boolean binder = ServiceFilterBinder.class.isAssignableFrom(cls);
+		if (binder) {
+			cls = ((ServiceFilterBinder) handlerMap.get(request.getClassName()))
+					.getObject().getClass();
 		}
+		ReflectionUtils utils = new ReflectionUtils();
+		try {
+			Method method = ReflectionUtils.getDeclaredMethod(cls,
+					request.getMethodName(), request.getTypeParameter());
+			utils.listMethod(method, false);
+			String signatureMethod = utils.getProvider().toString();
+			visitor.set(ModuleMetricsHandler.getInstance().visit(
+					request.getClassName(), signatureMethod));
+			facade.set(new InvokeEventBusFacade(ModuleMetricsHandler
+					.getInstance(), visitor.get().getModuleName(), visitor
+					.get().getMethodName()));
+			watcher.get().addObserver(
+					new InvokeObserver(facade.get(), visitor.get()));
+			watcher.get().watch(ModuleEvent.INVOKE_EVENT);
+		} finally {
+			utils.clearProvider();
+		}
+	}
 
-		ctx.writeAndFlush(response).addListener(new ChannelFutureListener() {
-
-			@Override
-			public void operationComplete(ChannelFuture future)
-					throws Exception {
-				System.out.println("RPC Server Send message-id response:"
-						+ response.getMessageId() + " return:"
-						+ response.getResultDesc().toString());
-			}
-		});
+	@Override
+	protected void injectSuccInvoke(long invokeTimespan) {
+		watcher.get().addObserver(
+				new InvokeSuccObserver(facade.get(), visitor.get(),
+						invokeTimespan));
+		watcher.get().watch(ModuleEvent.INVOKE_SUCC_EVENT);
 
 	}
 
-	private Object reflect(MessageRequest request)
-			throws NoSuchMethodException, IllegalAccessException,
-			InvocationTargetException {
-		String className = request.getClassName();
-		Object serviceBean = handlerMap.get(className);
-		String methodName = request.getMethodName();
-		Object[] params = request.getParameterVal();
-		return MethodUtils.invokeMethod(serviceBean, methodName, params);
+	@Override
+	protected void injectFailInvoke(Throwable error) {
+		watcher.get().addObserver(
+				new InvokeFailObserver(facade.get(), visitor.get(), error));
+		watcher.get().watch(ModuleEvent.INVOKE_FAIL_EVENT);
 	}
 
-	public MessageRequest getRequest() {
-		return request;
+	@Override
+	protected void injectFilterInvoke() {
+		watcher.get().addObserver(
+				new InvokeFilterObserver(facade.get(), visitor.get()));
+		watcher.get().watch(ModuleEvent.INVOKE_FILTER_EVENT);
 	}
 
-	public void setRequest(MessageRequest request) {
-		this.request = request;
+	@Override
+	protected void acquire() {
+		factory.acquire();
 	}
 
-	public MessageResponse getResponse() {
-		return response;
+	@Override
+	protected void release() {
+		factory.release();
 	}
 
 }
