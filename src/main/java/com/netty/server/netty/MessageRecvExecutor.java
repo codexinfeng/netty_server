@@ -155,9 +155,10 @@ public class MessageRecvExecutor implements ApplicationContextAware {
 				future = bootstrap.bind(host, port).sync();
 				future.addListener(new ChannelFutureListener() {
 					@Override
-					public void operationComplete(ChannelFuture future)
+					public void operationComplete(ChannelFuture channelFuture)
 							throws Exception {
-						if (future.isSuccess()) {
+						//成功后开启监控接口
+						if (channelFuture.isSuccess()) {
 							final ExecutorService executor = Executors
 									.newFixedThreadPool(numberOfEchoThreadsPool);
 							ExecutorCompletionService<Boolean> completionService = new ExecutorCompletionService<>(
@@ -172,7 +173,7 @@ public class MessageRecvExecutor implements ApplicationContextAware {
 											ModuleMetricsHandler.getStartTime(),
 											(RpcSystemConfig.SYSTEM_PROPERTY_JMX_METRICS_SUPPORT ? "open"
 													: "close"));
-							future.channel().closeFuture().sync()
+							channelFuture.channel().closeFuture().sync()
 									.addListener(new ChannelFutureListener() {
 										@Override
 										public void operationComplete(

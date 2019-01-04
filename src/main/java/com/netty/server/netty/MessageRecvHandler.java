@@ -30,6 +30,7 @@ public class MessageRecvHandler extends ChannelInboundHandlerAdapter {
 		// MessageRecvInitializeCallTask(
 		// request, response, handlerMap);
 		// MessageRecvExecutor.submit(recvTask, ctx, request, response);
+		//根据facade 获取对应Task
 		RecvInitializeTaskFacade facade = new RecvInitializeTaskFacade(request,
 				response, handlerMap);
 		Callable<Boolean> recvTask = facade.getTask();

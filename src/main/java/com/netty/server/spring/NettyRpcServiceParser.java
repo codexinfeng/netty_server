@@ -10,7 +10,7 @@ public class NettyRpcServiceParser implements BeanDefinitionParser {
 
 	@Override
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
-		String interfaceName = element.getAttribute("interfaaceName");
+		String interfaceName = element.getAttribute("interfaceName");
 		String ref = element.getAttribute("ref");
 		String filter = element.getAttribute("filter");
 		RootBeanDefinition beanDefinition = new RootBeanDefinition();

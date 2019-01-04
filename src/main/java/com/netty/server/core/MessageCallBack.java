@@ -26,7 +26,6 @@ public class MessageCallBack {
 
 		try {
 			lock.lock();
-			// 超时时间,rpc服务器10s没响应,默认返回空,不是每个请求都要等10s吗
 			finish.await(10 * 1000, TimeUnit.MICROSECONDS);
 			if (this.response != null) {
 				return this.response.getResultDesc();
@@ -43,7 +42,6 @@ public class MessageCallBack {
 
 		try {
 			lock.lock();
-			// 结束finish await状态
 			finish.signal();
 			this.response = response;
 		} finally {

@@ -17,11 +17,13 @@
 		</property>
 	</bean>
 	<bean id="beanFactory" class="com.netty.server.spring.BeanFactoryUtils" />
-	<nettyrpc:reference id="addCalc"
-		interfaceName="com.netty.server.servicebean.Caculate" protocol="KRYO_SERIALIZE"
-		ipAddr="127.0.0.1:18888" />
+
+	<nettyrpc:service id="caculate"
+		interfaceName="com.netty.server.servicebean.Caculate" ref="calAddCaculateService" />
+	<bean id="calAddCaculateService" class="com.netty.server.servicebean.CaculateImpl" />
+
 	<nettyrpc:registry id="rpcRegistry" ipAddr="${rpc.server.addr}"
-		echoApiPort="${rpc.server.echo.api.port}" protocol="PROTOSTUFFSERIALIZE"></nettyrpc:registry>
+		echoApiPort="${rpc.server.echo.api.port}" protocol="KRYO_SERIALIZE"></nettyrpc:registry>
 	<bean id="simpleFilter" class="com.netty.server.filter.support.SimpleFilter"></bean>
 
 	<bean id="listeners" class="com.netty.server.listener.ModuleListenerChainWrapper">

@@ -59,6 +59,7 @@ public class MessageSendHandler extends ChannelInboundHandlerAdapter {
 	public MessageCallBack sendRequest(MessageRequest request) {
 		MessageCallBack callBack = new MessageCallBack(request);
 		mapCallBack.put(request.getMessageId(), callBack);
+		//下一步谁来真正处理这个消息
 		channel.writeAndFlush(request);
 		return callBack;
 	}
