@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:nettyrpc="http://www.envelope.com/nettyrpc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.envelope.com/nettyrpc
+       http://www.envelope.com/nettyrpc/nettyrpc.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:rpc-server.properties</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="beanFactory" class="com.netty.server.spring.BeanFactoryUtils" />
+	<nettyrpc:reference id="addCalc"
+		interfaceName="com.netty.server.servicebean.Caculate" protocol="KRYO_SERIALIZE"
+		ipAddr="127.0.0.1:18888" />
+	<nettyrpc:registry id="rpcRegistry" ipAddr="${rpc.server.addr}"
+		echoApiPort="${rpc.server.echo.api.port}" protocol="PROTOSTUFFSERIALIZE"></nettyrpc:registry>
+	<bean id="simpleFilter" class="com.netty.server.filter.support.SimpleFilter"></bean>
+
+	<bean id="listeners" class="com.netty.server.listener.ModuleListenerChainWrapper">
+		<constructor-arg name="modular">
+			<bean class="com.netty.server.core.DefaultModular"></bean>
+		</constructor-arg>
+		<property name="listeners">
+			<list>
+				<ref bean="listenerAdapter"></ref>
+			</list>
+		</property>
+	</bean>
+	<bean id="listenerAdapter" class="com.netty.server.listener.support.ModuleListenerAdapter" />
+	<!--FilterChain -->
+	<bean id="classLoaderChainFilter" class="com.netty.server.filter.support.ClassLoaderChainFilter" />
+	<bean id="echoChainFilter" class="com.netty.server.filter.support.EchoChainFilter" />
+	<bean id="calc" class="com.netty.server.servicebean.CaculateImpl" />
+</beans>

@@ -15,8 +15,8 @@ public class RpcSystemConfig {
 	public static final int SYSTEM_PROPERTY_THREADPOOL_QUEUE_NAME = Integer
 			.getInteger("nettyrpc.default.queue.nums", -1);
 
-	public static final String RPC_COMPILER_SPI_ATTR = "AccessAdaptive";
-	public static final String RPC_ABILITY_DETAIL_SPI_STTR = "AbilityDetail";
+	public static final String RPC_COMPILER_SPI_ATTR = "com.netty.server.compiler.AccessAdaptive";
+	public static final String RPC_ABILITY_DETAIL_SPI_STTR = "com.netty.server.view.AbilityDetail";
 	public static final int SYSTEM_PROPERTY_JMX_INVOKE_METRICS = Integer
 			.getInteger("nettyrpc.jmx.invoke.metrics", 1);
 	public static final boolean SYSTEM_PROPERTY_JMX_METRICS_SUPPORT = RpcSystemConfig.SYSTEM_PROPERTY_JMX_INVOKE_METRICS != 0;

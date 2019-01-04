@@ -18,6 +18,7 @@ public class NettyRpcRegistery implements InitializingBean, DisposableBean {
 	private String echoApiPort;
 	private AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
 
+	//MessageRecvExecutor.getInstance() 获取的为同一个对象
 	@Override
 	public void destroy() throws Exception {
 		MessageRecvExecutor.getInstance().stop();

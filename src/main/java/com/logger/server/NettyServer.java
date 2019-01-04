@@ -17,7 +17,6 @@ import io.netty.handler.codec.string.StringEncoder;
 public class NettyServer {
 
 	public void bindPort(int port) {
-		// 配置服务端的NIO线程组
 		EventLoopGroup bossGroup = new NioEventLoopGroup();
 		EventLoopGroup workerGroup = new NioEventLoopGroup();
 
@@ -28,7 +27,6 @@ public class NettyServer {
 
 		try {
 			ChannelFuture future = b.bind(port).sync();
-			// 等待服务端监听端口关闭
 			future.channel().closeFuture().sync();
 		} catch (InterruptedException e) {
 			bossGroup.shutdownGracefully();
@@ -43,7 +41,6 @@ public class NettyServer {
 			ChannelPipeline pipeline = ch.pipeline();
 			pipeline.addLast("decoder", new StringDecoder(Charset.forName("utf-8")));
 			pipeline.addLast("encoder", new StringEncoder(Charset.forName("utf-8")));
-			// 增加自己的handler
 			ch.pipeline().addLast(new MessageReceiveHandler());
 		}
 

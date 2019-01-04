@@ -10,14 +10,12 @@ public class MessageReceiveHandler extends SimpleChannelInboundHandler<Object> {
 			throws Exception {
 		String message = obj.toString();
 		System.out
-				.println(ctx.channel().remoteAddress() + " 传递过来的消息: " + message);
-		// 回传消息
+				.println(ctx.channel().remoteAddress() + " 锟斤拷锟捷癸拷锟斤拷锟斤拷锟斤拷息: " + message);
 		ctx.writeAndFlush("Receive your msg");
 
 	}
 
 	/**
-	 * 启动时触发
 	 */
 
 	@Override

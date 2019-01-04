@@ -16,7 +16,7 @@ public class NettyRpcRegisteryParser implements BeanDefinitionParser {
 		String protocolType = element.getAttribute("protocol");
 		RootBeanDefinition beanDefinition = new RootBeanDefinition();
 		beanDefinition.setBeanClass(NettyRpcRegistery.class);
-		beanDefinition.getPropertyValues().addPropertyValue("idAddr", ipAddr);
+		beanDefinition.getPropertyValues().addPropertyValue("ipAddr", ipAddr);
 		beanDefinition.getPropertyValues().addPropertyValue("echoApiPort",
 				echoApiPort);
 		beanDefinition.getPropertyValues().addPropertyValue("protocol",
