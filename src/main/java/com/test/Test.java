@@ -4,6 +4,7 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.locks.LockSupport;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.ApplicationContextAware;
 
 public class Test {
 
