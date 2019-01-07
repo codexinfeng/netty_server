@@ -105,9 +105,13 @@ public class MessageRecvExecutor implements ApplicationContextAware {
 		}
 		ListenableFuture<Boolean> listenableFuture = threadPoolExecutor
 				.submit(task);
+		//异步提交任务
 		Futures.addCallback(listenableFuture, new FutureCallback<Boolean>() {
+			//任务执行成功后
 			@Override
 			public void onSuccess(Boolean result) {
+				System.out.println(response.getResultDesc());
+				//response 返回,返回成功后输出
 				ctx.writeAndFlush(response).addListener(
 						new ChannelFutureListener() {
 							@Override

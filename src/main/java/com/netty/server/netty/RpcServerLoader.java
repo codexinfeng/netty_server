@@ -69,7 +69,7 @@ public class RpcServerLoader {
 			// threadPoolExecutor.submit(new MessageSendInitializeTask(
 			// eventLoopGroup, remoteAddr, serializeProtocol));
 			ListenableFuture<Boolean> listenableFuture = threadPoolExecutor
-					.submit(new MessageSendInitializeCallTask(eventLoopGroup,
+					.submit(new MessageSendInitializeTask(eventLoopGroup,
 							remoteAddr, serializeProtocol));
 			Futures.addCallback(listenableFuture,
 					new FutureCallback<Boolean>() {

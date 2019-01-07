@@ -53,6 +53,7 @@ public class MessageSendInitializeTask implements Callable<Boolean> {
 
 	@Override
 	public Boolean call() throws Exception {
+		//异步发送消息
 		Bootstrap b = new Bootstrap();
 		b.group(eventLoopGroup)
 				.channel(NioSocketChannel.class)

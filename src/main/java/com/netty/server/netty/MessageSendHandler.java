@@ -52,6 +52,7 @@ public class MessageSendHandler extends ChannelInboundHandlerAdapter {
 	}
 
 	public void close() {
+		//加入关闭事件
 		channel.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(
 				ChannelFutureListener.CLOSE);
 	}

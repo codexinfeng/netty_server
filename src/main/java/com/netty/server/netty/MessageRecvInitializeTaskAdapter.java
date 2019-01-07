@@ -4,7 +4,11 @@ import java.util.Map;
 
 import com.netty.server.model.MessageRequest;
 import com.netty.server.model.MessageResponse;
-
+/**
+ * 原始处理类
+ * @author JZG
+ *
+ */
 public class MessageRecvInitializeTaskAdapter extends
 		AbstractMessageRecvInitializeTask {
 

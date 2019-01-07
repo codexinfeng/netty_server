@@ -14,7 +14,6 @@ public class NettyRpcReferenceParser implements BeanDefinitionParser {
 		String ipAddr = element.getAttribute("ipAddr");
 		String protocol = element.getAttribute("protocol");
 		String id = element.getAttribute("id");
-		// 自己定义beanDefinition
 		RootBeanDefinition beanDefinition = new RootBeanDefinition();
 		beanDefinition.setBeanClass(NettyRpcReference.class);
 		beanDefinition.setLazyInit(false);

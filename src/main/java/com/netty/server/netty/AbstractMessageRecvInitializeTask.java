@@ -15,7 +15,7 @@ import com.netty.server.core.RpcSystemConfig;
 import com.netty.server.model.MessageRequest;
 import com.netty.server.model.MessageResponse;
 import com.netty.server.spring.BeanFactoryUtils;
-
+//使用模版模式
 public abstract class AbstractMessageRecvInitializeTask implements
 		Callable<Boolean> {
 
@@ -100,6 +100,7 @@ public abstract class AbstractMessageRecvInitializeTask implements
 		advisor.setAdvice(new MethodProxyAdvisor(handlerMap));
 		weaver.addAdvisor(advisor);
 		MethodInvoker mi = (MethodInvoker) weaver.getProxy();
+		//对代理的方法加入切面
 		Object obj = invoke(mi, request);
 		invokeTimespan = mi.getInvokeTimespan();
 		setReturnNotNull(((MethodProxyAdvisor) advisor.getAdvice())

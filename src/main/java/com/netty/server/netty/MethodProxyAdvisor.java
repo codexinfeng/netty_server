@@ -38,6 +38,7 @@ public class MethodProxyAdvisor implements MethodInterceptor {
 		((MethodInvoker) invocation.getThis())
 				.setServiceBean(existFilter ? ((ServiceFilterBinder) serviceBean)
 						.getObject() : serviceBean);
+		//加入过滤机制
 		if (existFilter) {
 			ServiceFilterBinder processors = (ServiceFilterBinder) serviceBean;
 			if (processors.getFilter() != null) {

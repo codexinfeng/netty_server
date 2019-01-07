@@ -5,7 +5,6 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
 public class HessianSerializePool {
 
-	// 为了避免重复产生对象,提高JVM内存利用率,引入对象池技术,高并发序列化/反序列号场景,效率提升
 	private GenericObjectPool<HessianSerialize> hessianPool;
 	private static HessianSerializePool poolFactory = null;
 
@@ -28,13 +27,9 @@ public class HessianSerializePool {
 		hessianPool = new GenericObjectPool<HessianSerialize>(
 				new HessianSerializeFactory());
 		GenericObjectPoolConfig config = new GenericObjectPoolConfig();
-		// 最大池对象总数
 		config.setMaxTotal(maxTotal);
-		// 最小空闲数
 		config.setMinIdle(minIdle);
-		// 最大等待时间,默认-1 表示无线等待
 		config.setMaxWaitMillis(maxWaitMillis);
-		// 退出连接的最小空闲时间
 		config.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
 		hessianPool.setConfig(config);
 

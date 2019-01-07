@@ -5,7 +5,7 @@ import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 
 /**
- * RPC ±à½âÂë
+ * RPC ï¿½ï¿½ï¿½ï¿½ï¿½
  * 
  * @author JZG
  *
@@ -15,7 +15,6 @@ public interface MessageCodeUtil {
 	public final int MESSAGE_LENGTH = 4;
 
 	/**
-	 * ¼ÓÃÜ
 	 * 
 	 * @param out
 	 * @param message
@@ -25,7 +24,6 @@ public interface MessageCodeUtil {
 			throws IOException;
 
 	/**
-	 * ½âÃÜ
 	 * 
 	 * @param body
 	 * @return

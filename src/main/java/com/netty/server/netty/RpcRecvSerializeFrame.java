@@ -13,7 +13,11 @@ import com.netty.server.netty.handler.KryoRecvHandler;
 import com.netty.server.netty.handler.NettyRpcRecvHandler;
 import com.netty.server.netty.handler.ProtostuffRecvHandler;
 import com.netty.server.serialize.support.RpcSerializeFrame;
-
+/**
+ * 序列化框架
+ * @author JZG
+ *
+ */
 public class RpcRecvSerializeFrame implements RpcSerializeFrame {
 
 	private Map<String, Object> handlerMap = null;
@@ -25,6 +29,7 @@ public class RpcRecvSerializeFrame implements RpcSerializeFrame {
 	private static ClassToInstanceMap<NettyRpcRecvHandler> handler = MutableClassToInstanceMap
 			.create();
 	static {
+		//所有需要序列号方式放入map
 		handler.putInstance(JdkNativeRecvHandler.class,
 				new JdkNativeRecvHandler());
 		handler.putInstance(KryoRecvHandler.class, new KryoRecvHandler());
