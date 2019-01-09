@@ -12,7 +12,10 @@ public class ModuleListenerChainWrapper implements Modular {
 
 	private Modular modular;
 	private List<ModuleListener> listeners;
-
+    /**
+     * Modular 返回的是Provider
+     * @param modular
+     */
 	public ModuleListenerChainWrapper(Modular modular) {
 		if (modular == null) {
 			throw new IllegalArgumentException("module is null");

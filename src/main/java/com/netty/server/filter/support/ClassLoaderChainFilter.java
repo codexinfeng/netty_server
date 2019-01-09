@@ -15,6 +15,8 @@ public class ClassLoaderChainFilter implements ChainFilter {
 				invoker.getInterface().getClassLoader());
 		try {
 			Object result = null;
+			System.out.println("ClassLoaderChainFilter##TRACE MESSAGE-ID:"
+					+ request.getMessageId());
 			result = invoker.invoke(request);
 			return result;
 		} catch (Throwable throwable) {

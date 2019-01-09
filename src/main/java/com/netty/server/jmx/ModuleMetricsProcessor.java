@@ -38,7 +38,7 @@ public class ModuleMetricsProcessor {
 
 	private void init() {
 		ModuleMetricsHandler handler = ModuleMetricsHandler.getInstance();
-		connection = handler.getConnection();
+		connection = handler.connect();
 		while (true) {
 			if (connection != null) {
 				break;

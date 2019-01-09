@@ -18,7 +18,7 @@ public class RpcSystemConfig {
 	public static final String RPC_COMPILER_SPI_ATTR = "com.netty.server.compiler.AccessAdaptive";
 	public static final String RPC_ABILITY_DETAIL_SPI_STTR = "com.netty.server.view.AbilityDetail";
 	public static final int SYSTEM_PROPERTY_JMX_INVOKE_METRICS = Integer
-			.getInteger("nettyrpc.jmx.invoke.metrics", 0);
+			.getInteger("nettyrpc.jmx.invoke.metrics", 1);
 	public static final boolean SYSTEM_PROPERTY_JMX_METRICS_SUPPORT = RpcSystemConfig.SYSTEM_PROPERTY_JMX_INVOKE_METRICS != 0;
 
 	public static final int SYSTEM_PROPERTY_JMX_METRICS_HASH_NUMS = Integer

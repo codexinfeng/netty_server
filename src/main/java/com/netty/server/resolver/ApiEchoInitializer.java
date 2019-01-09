@@ -19,9 +19,9 @@ public class ApiEchoInitializer extends ChannelInitializer<SocketChannel> {
 		ChannelPipeline pipeline = ch.pipeline();
 		if (sslCtx != null) {
 			pipeline.addLast(sslCtx.newHandler(ch.alloc()));
-			pipeline.addLast(new HttpServerCodec());
-			pipeline.addLast(new ApiEchoHandler());
 		}
+		pipeline.addLast(new HttpServerCodec());
+		pipeline.addLast(new ApiEchoHandler());
 
 	}
 }

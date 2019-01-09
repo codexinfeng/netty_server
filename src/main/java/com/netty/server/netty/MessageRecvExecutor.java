@@ -105,13 +105,13 @@ public class MessageRecvExecutor implements ApplicationContextAware {
 		}
 		ListenableFuture<Boolean> listenableFuture = threadPoolExecutor
 				.submit(task);
-		//异步提交任务
+		// 异步提交任务
 		Futures.addCallback(listenableFuture, new FutureCallback<Boolean>() {
-			//任务执行成功后
+			// 任务执行成功后
 			@Override
 			public void onSuccess(Boolean result) {
 				System.out.println(response.getResultDesc());
-				//response 返回,返回成功后输出
+				// response 返回,返回成功后输出
 				ctx.writeAndFlush(response).addListener(
 						new ChannelFutureListener() {
 							@Override
@@ -157,12 +157,14 @@ public class MessageRecvExecutor implements ApplicationContextAware {
 			try {
 				// 绑定主机和端口号
 				future = bootstrap.bind(host, port).sync();
+				System.out.println(future);
 				future.addListener(new ChannelFutureListener() {
 					@Override
 					public void operationComplete(ChannelFuture channelFuture)
 							throws Exception {
-						//成功后开启监控接口
+						// 成功后开启监控接口
 						if (channelFuture.isSuccess()) {
+							System.out.println(channelFuture);
 							final ExecutorService executor = Executors
 									.newFixedThreadPool(numberOfEchoThreadsPool);
 							ExecutorCompletionService<Boolean> completionService = new ExecutorCompletionService<>(
@@ -177,7 +179,7 @@ public class MessageRecvExecutor implements ApplicationContextAware {
 											ModuleMetricsHandler.getStartTime(),
 											(RpcSystemConfig.SYSTEM_PROPERTY_JMX_METRICS_SUPPORT ? "open"
 													: "close"));
-							channelFuture.channel().closeFuture().sync()
+							channelFuture.channel().closeFuture()
 									.addListener(new ChannelFutureListener() {
 										@Override
 										public void operationComplete(

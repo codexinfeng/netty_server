@@ -19,7 +19,8 @@
 	<bean id="beanFactory" class="com.netty.server.spring.BeanFactoryUtils" />
 
 	<nettyrpc:service id="caculate"
-		interfaceName="com.netty.server.servicebean.Caculate" ref="calAddCaculateService" />
+		interfaceName="com.netty.server.servicebean.Caculate" ref="calAddCaculateService"
+		filter="simpleFilter" />
 	<bean id="calAddCaculateService" class="com.netty.server.servicebean.CaculateImpl" />
 
 	<nettyrpc:registry id="rpcRegistry" ipAddr="${rpc.server.addr}"
@@ -36,9 +37,17 @@
 			</list>
 		</property>
 	</bean>
+	<bean id="modular" class="com.netty.server.filter.ModuleFilterChainWrapper">
+		<constructor-arg name="modular" ref="listeners" />
+		<property name="filters">
+			<list>
+				<ref bean="classLoaderChainFilter" />
+				<ref bean="echoChainFilter" />
+			</list>
+		</property>
+	</bean>
 	<bean id="listenerAdapter" class="com.netty.server.listener.support.ModuleListenerAdapter" />
 	<!--FilterChain -->
 	<bean id="classLoaderChainFilter" class="com.netty.server.filter.support.ClassLoaderChainFilter" />
 	<bean id="echoChainFilter" class="com.netty.server.filter.support.EchoChainFilter" />
-	<bean id="calc" class="com.netty.server.servicebean.CaculateImpl" />
 </beans>
